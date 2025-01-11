@@ -5,9 +5,14 @@ echo "Starting Apache web server..."
 systemctl start apache2
 systemctl enable apache2
 
-# Configure Apache to listen on port 9999
-echo "Configuring Apache to listen on port 9999..."
-echo "Listen 9999" >> /etc/apache2/ports.conf
+# Check if port 9999 is already configured
+if ! grep -q "Listen 9999" /etc/apache2/ports.conf; then
+  # Configure Apache to listen on port 9999
+  echo "Configuring Apache to listen on port 9999..."
+  echo "Listen 9999" >> /etc/apache2/ports.conf
+else
+  echo "Port 9999 is already configured."
+fi
 
 # Create a new virtual host configuration for the web server
 echo "Setting up Apache virtual host..."
