@@ -1,131 +1,98 @@
-# Nominatim Location Adder
+# GeoLocation Create API Documentation
 
-A bash script to easily add custom locations to your Nominatim instance. This tool allows you to add places, businesses, or points of interest directly to your Nominatim database with detailed addressing information.
+### Step 1: Install the API Script
 
-## Features
+To install the **GeoLocation Create API** script on your server:
 
-- Easy command-line interface with both short and long options
-- Parameter validation for required fields
-- Latitude and longitude format validation
-- Automatic OSM file generation
-- Nominatim database integration
-- Automatic index updating
+1. **Download the script**:
 
-## Prerequisites
-
-- Root access to the server
-- Nominatim instance installed and configured
-- Bash shell environment
-- `nominatim` command-line tools
-
-## Installation
-
-1. Download the script directly:
 ```bash
-curl -O https://raw.githubusercontent.com/mashikur-steadfast/nominatim-add-location/main/add.sh
+curl -O https://raw.githubusercontent.com/mashikur-steadfast/nominatim-add-location/refs/heads/main/api.sh
 ```
 
-2. Make it executable:
+2. **Set executable permissions**:
+
 ```bash
-chmod +x add.sh
+chmod +x api.sh
 ```
 
-## Configuration
+3. **Run the script**:
 
-Default configuration variables in the script:
-- `NM_USER='ntim'` - Nominatim user
-- `PROJECT_DIR='/var/www/nominatim'` - Nominatim project directory
-
-Modify these values in the script if your setup differs.
-
-## Usage
-
-### Basic Syntax
 ```bash
-./add.sh [OPTIONS]
+bash api.sh
 ```
 
-### Command Line Options
+This will:
 
-| Short Option | Long Option   | Description           | Required | Example Value        |
-|-------------|---------------|----------------------|----------|---------------------|
-| -n          | --name        | Location name        | Yes      | "Your Location Name"         |
-| -c          | --city        | City name           | Yes      | "Dhaka"             |
-| -s          | --suburb      | Suburb name         | Yes      | "Mohammadpur"       |
-| -co         | --country     | Country name        | Yes      | "Bangladesh"        |
-| -lat        | --latitude    | Latitude            | Yes      | 23.744431306905756  |
-| -lon        | --longitude   | Longitude           | Yes      | 90.35132875476877   |
-| -h          | --help        | Show help message   | No       | -                   |
+- Start Apache on port `9999`.
+- Set up a new virtual host for the **GeoLocation Create API**.
+- Ensure the correct PHP version is used.
+- Embed the API handling code in `/var/www/api/index.php`.
 
-### Example Usage
+### Step 2: Set the API Key
 
-Using short options:
+1. Open the `/var/www/api/index.php` file and replace the placeholder API key `XXXX` with your actual API key.
+
+```php
+define('API_KEY', 'YOUR_API_KEY');
+```
+
+### Step 3: Authentication
+
+To authenticate your API requests, include the `X-API-Key` header with your valid API key.
+
+### Step 4: Postman Collection
+
+For an enhanced experience with the **GeoLocation Create API**, you can download and import the Postman collection to quickly test the API.
+
+- [Download the Postman Collection](https://raw.githubusercontent.com/mashikur-steadfast/nominatim-add-location/refs/heads/main/postman_collection.json)
+
+### Step 5: Example Request
+
+Here is an example of how to send a `POST` request to the API using `curl`:
+
 ```bash
-sudo ./add.sh -n "Your Location Name" -c "Dhaka" -s "Mohammadpur" -co "Bangladesh" -lat 23.744431306905756 -lon 90.35132875476877
+curl -X POST http://localhost:9999 \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Location Name",
+    "city": "City Name",
+    "suburb": "Suburb Name",
+    "country": "Country Name",
+    "latitude": 40.7128,
+    "longitude": -74.0060
+}'
 ```
 
-Using long options:
-```bash
-sudo ./add.sh --name "Your Location Name" --city "Dhaka" --suburb "Mohammadpur" --country "Bangladesh" --latitude 23.744431306905756 --longitude 90.35132875476877
+### Example Response
+
+**Success:**
+
+```json
+{
+  "success": true,
+  "message": "Location added successfully",
+  "output": ["Script output"]
+}
 ```
 
-Show help:
-```bash
-./add.sh --help
+**Error (Invalid API Key):**
+
+```json
+{
+  "error": "Invalid API key"
+}
 ```
 
-## Process Flow
+**Error (Missing Fields):**
 
-1. Validates all required parameters
-2. Checks for root privileges
-3. Creates a temporary OSM file with location data
-4. Imports the location data into Nominatim
-5. Updates the search index
-6. Cleans up temporary files
-
-## Output
-
-The script will provide feedback at each step:
-```
-Starting location addition process...
-Creating OSM file with location data...
-Importing custom location into Nominatim...
-Reindexing Nominatim data...
-Location addition completed.
-You can now search for '[Location Name]' in your Nominatim instance.
-Note: It may take a few minutes for the new location to be searchable.
+```json
+{
+  "error": "Missing required fields: name, city, suburb, country, latitude, longitude"
+}
 ```
 
-## Error Handling
+---
 
-The script includes validation for:
-- Missing required parameters
-- Invalid latitude/longitude formats
-- Root privilege requirements
-
-## Notes
-
-- The location may take a few minutes to appear in search results due to indexing
-- The script must be run with root privileges
-- A unique random ID is generated for each location
-- Temporary files are automatically cleaned up after execution
-
-## Contributing
-
-Feel free to submit issues and enhancement requests through GitHub's issue tracker.
-
-## License
-
-MIT License - feel free to use and modify for your needs.
-
-## Author
-
-Mashikur Rahman (mashikur.steadfast@gmail.com)
-
-## Version History
-
-- 1.0.0 (2025-01-12)
-  - Initial release
-  - Basic location addition functionality
-  - Parameter validation
-  - Documentation
+The **GeoLocation Create API** is now ready to use after completing the installation and configuration steps!
