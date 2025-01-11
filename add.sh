@@ -97,6 +97,7 @@ create_osm_file() {
 <osm version="0.6" generator="Custom Location Script">
   <node id="${UNIQUE_ID}" lat="${LAT}" lon="${LON}" version="1">
     <tag k="name" v="${LOCATION_NAME}"/>
+    <tag k="office" v="software"/>
     <tag k="addr:city" v="${CITY}"/>
     <tag k="addr:suburb" v="${SUBURB}"/>
     <tag k="addr:country" v="${COUNTRY}"/>
