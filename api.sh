@@ -42,7 +42,7 @@ mkdir -p /var/www/api
 
 # Embed the PHP code directly into the script for /var/www/api/index.php
 echo "Creating the index.php with embedded PHP code..."
-cat <<EOF > /var/www/api/index.php
+cat <<'EOF' > /var/www/api/index.php
 <?php
 header('Content-Type: application/json');
 
@@ -196,6 +196,12 @@ EOF
 # Set appropriate permissions
 echo "Setting file permissions..."
 chown -R www-data:www-data /var/www/api
+
+# Check if the line already exists to avoid duplicates
+if ! grep -q "www-data ALL=(ALL) NOPASSWD: /tmp/add.sh" /etc/sudoers; then
+    echo "www-data ALL=(ALL) NOPASSWD: /tmp/add.sh" | sudo tee -a /etc/sudoers > /dev/null
+    echo "Line added successfully to /etc/sudoers"
+fi
 
 # Finished
 echo "Web server setup complete. You can access it at http://localhost:9999"
