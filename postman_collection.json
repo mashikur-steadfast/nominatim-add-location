@@ -1,0 +1,97 @@
+{
+	"info": {
+		"_postman_id": "50777d99-d33d-4921-8d1a-71dbfa0d445f",
+		"name": "Geo Location API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19746263"
+	},
+	"item": [
+		{
+			"name": "add-location",
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "XXXX",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "X-API-Key",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "xxxx",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Hello World\",\r\n    \"city\": \"Dhaka\",\r\n    \"suburb\": \"Mohammadpur\",\r\n    \"country\": \"Bangladesh\",\r\n    \"latitude\": 23.744431306905756,\r\n    \"longitude\": 90.35132875476877\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search-location",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{base_url}}/nominatim/search.php?q=Hello World&polygon_geojson=1&format=jsonv2",
+					"protocol": "http",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"nominatim",
+						"search.php"
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Hello World"
+						},
+						{
+							"key": "polygon_geojson",
+							"value": "1"
+						},
+						{
+							"key": "format",
+							"value": "jsonv2"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
