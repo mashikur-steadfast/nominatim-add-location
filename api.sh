@@ -51,6 +51,11 @@ cat <<'EOF' > /var/www/api/index.php
 <?php
 header('Content-Type: application/json');
 
+// Enable error logging
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+error_reporting(E_ALL);
+
 // Configuration
 define('GITHUB_RAW_URL', 'https://raw.githubusercontent.com/mashikur-steadfast/nominatim-add-location/refs/heads/main/add.sh');
 define('SCRIPT_PATH', '/tmp/add.sh');
@@ -102,16 +107,19 @@ function validateInput($data) {
 function downloadScript() {
     $script = file_get_contents(GITHUB_RAW_URL);
     if ($script === false) {
+        error_log("Failed to download script from: " . GITHUB_RAW_URL);
         return ['error' => 'Failed to download script from GitHub'];
     }
     
     // Save script to temporary location
     if (file_put_contents(SCRIPT_PATH, $script) === false) {
+        error_log("Failed to save script to: " . SCRIPT_PATH);
         return ['error' => 'Failed to save script'];
     }
     
     // Make script executable
     if (!chmod(SCRIPT_PATH, 0755)) {
+        error_log("Failed to make script executable: " . SCRIPT_PATH);
         return ['error' => 'Failed to make script executable'];
     }
     
@@ -122,13 +130,25 @@ function downloadScript() {
 function buildCommand($data) {
     $params = [];
     
-    // Required parameters with proper escaping
-    $params[] = "-n '" . str_replace("'", "'\\''", $data['name']) . "'";
-    $params[] = "-c '" . str_replace("'", "'\\''", $data['city']) . "'";
-    $params[] = "-s '" . str_replace("'", "'\\''", $data['suburb']) . "'";
-    $params[] = "-co '" . str_replace("'", "'\\''", $data['country']) . "'";
-    $params[] = "-lat " . $data['latitude'];
-    $params[] = "-lon " . $data['longitude'];
+    // Required parameters with proper escaping and quote handling
+    $requiredParams = [
+        'name' => '-n',
+        'city' => '-c',
+        'suburb' => '-s',
+        'country' => '-co',
+        'latitude' => '-lat',
+        'longitude' => '-lon'
+    ];
+    
+    foreach ($requiredParams as $key => $flag) {
+        $value = $data[$key];
+        // Only wrap non-numeric values in quotes
+        if (in_array($key, ['latitude', 'longitude'])) {
+            $params[] = $flag . " " . floatval($value);
+        } else {
+            $params[] = $flag . " '" . str_replace("'", "'\\''", $value) . "'";
+        }
+    }
     
     // Optional parameters mapping
     $optionalParams = [
@@ -163,8 +183,13 @@ function buildCommand($data) {
         }
     }
     
+    // Debug logging
+    error_log("Generated command parameters: " . implode(' ', $params));
+    
     // Construct the final command
-    return 'sudo ' . SCRIPT_PATH . ' ' . implode(' ', $params) . ' 2>&1';
+    $command = 'sudo ' . SCRIPT_PATH . ' ' . implode(' ', $params) . ' 2>&1';
+    error_log("Full command: " . $command);
+    return $command;
 }
 
 // Execute script with parameters
@@ -172,13 +197,20 @@ function executeScript($data) {
     $command = buildCommand($data);
     exec($command, $output, $return_code);
     
+    // Log output for debugging
+    error_log("Script output: " . implode("\n", $output));
+    error_log("Return code: " . $return_code);
+    
     // Clean up
-    unlink(SCRIPT_PATH);
+    if (file_exists(SCRIPT_PATH)) {
+        unlink(SCRIPT_PATH);
+    }
     
     if ($return_code !== 0) {
         return [
             'error' => 'Script execution failed',
-            'details' => implode("\n", $output)
+            'details' => implode("\n", $output),
+            'code' => $return_code
         ];
     }
     
@@ -212,6 +244,9 @@ function handleRequest() {
         http_response_code(400);
         return ['error' => 'Invalid JSON data'];
     }
+    
+    // Log received data
+    error_log("Received input: " . json_encode($input));
     
     // Validate input
     $validation = validateInput($input);
