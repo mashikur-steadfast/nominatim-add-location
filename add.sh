@@ -7,17 +7,39 @@ PROJECT_DIR='/var/www/nominatim'
 # Function to print usage
 print_usage() {
     echo "Usage: $0 [OPTIONS]"
-    echo "Options:"
+    echo "Required Options:"
     echo "  -n, --name         Location name"
     echo "  -c, --city         City name"
     echo "  -s, --suburb       Suburb name"
     echo "  -co, --country     Country name"
     echo "  -lat, --latitude   Latitude"
     echo "  -lon, --longitude  Longitude"
+    echo
+    echo "Optional Options:"
+    echo "  --english-name     Name in English"
+    echo "  --website          Website URL"
+    echo "  --house-number     House number"
+    echo "  --street           Street name"
+    echo "  --postcode         Postal code"
+    echo "  --state           State/Province"
+    echo "  --country-code     2-letter country code"
+    echo "  --phone            Phone number"
+    echo "  --email            Email address"
+    echo "  --hours            Opening hours"
+    echo "  --wheelchair       Wheelchair accessibility (yes/no/limited)"
+    echo "  --floors           Number of building floors"
+    echo "  --capacity         Maximum capacity"
+    echo "  --parking          Parking availability (yes/no)"
+    echo "  --internet         Internet access type"
+    echo "  --company          Company name"
+    echo "  --employees        Number of employees"
+    echo "  --creator          Creator name"
+    echo "  --maintainer      Maintainer name"
+    echo "  --maintainer-email Maintainer email"
     echo "  -h, --help         Show this help message"
     echo
     echo "Example:"
-    echo "  $0 -n 'Zavi Soft' -c 'Dhaka' -s 'Mohammadpur' -co 'Bangladesh' -lat 23.744431306905756 -lon 90.35132875476877"
+    echo "  $0 -n 'Zavi Soft' -c 'Dhaka' -s 'Mohammadpur' -co 'Bangladesh' -lat 23.744431306905756 -lon 90.35132875476877 --website 'https://example.com' --phone '+1234567890'"
     exit 1
 }
 
@@ -46,6 +68,86 @@ while [[ $# -gt 0 ]]; do
             ;;
         -lon|--longitude)
             LON="$2"
+            shift 2
+            ;;
+        --english-name)
+            ENGLISH_NAME="$2"
+            shift 2
+            ;;
+        --website)
+            WEBSITE_URL="$2"
+            shift 2
+            ;;
+        --house-number)
+            HOUSE_NUMBER="$2"
+            shift 2
+            ;;
+        --street)
+            STREET="$2"
+            shift 2
+            ;;
+        --postcode)
+            POSTCODE="$2"
+            shift 2
+            ;;
+        --state)
+            STATE="$2"
+            shift 2
+            ;;
+        --country-code)
+            COUNTRY_CODE="$2"
+            shift 2
+            ;;
+        --phone)
+            PHONE="$2"
+            shift 2
+            ;;
+        --email)
+            EMAIL="$2"
+            shift 2
+            ;;
+        --hours)
+            OPENING_HOURS="$2"
+            shift 2
+            ;;
+        --wheelchair)
+            WHEELCHAIR_ACCESS="$2"
+            shift 2
+            ;;
+        --floors)
+            NUM_FLOORS="$2"
+            shift 2
+            ;;
+        --capacity)
+            MAX_CAPACITY="$2"
+            shift 2
+            ;;
+        --parking)
+            PARKING_AVAILABLE="$2"
+            shift 2
+            ;;
+        --internet)
+            INTERNET_ACCESS="$2"
+            shift 2
+            ;;
+        --company)
+            COMPANY_NAME="$2"
+            shift 2
+            ;;
+        --employees)
+            NUM_EMPLOYEES="$2"
+            shift 2
+            ;;
+        --creator)
+            CREATOR_NAME="$2"
+            shift 2
+            ;;
+        --maintainer)
+            MAINTAINER="$2"
+            shift 2
+            ;;
+        --maintainer-email)
+            MAINTAINER_EMAIL="$2"
             shift 2
             ;;
         -h|--help)
@@ -89,21 +191,70 @@ validate_params() {
 # Generate a unique ID
 UNIQUE_ID=$((RANDOM * 1))
 
+# Function to add a tag if the value is not empty
+add_tag() {
+    local key="$1"
+    local value="$2"
+    if [[ -n "$value" ]]; then
+        echo "    <tag k=\"$key\" v=\"$value\"/>"
+    fi
+}
+
 # Create temporary OSM file
 create_osm_file() {
     echo "Creating OSM file with location data..."
-    cat > /tmp/custom_location.osm <<EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<osm version="0.6" generator="Custom Location Script">
-  <node id="${UNIQUE_ID}" lat="${LAT}" lon="${LON}" version="1">
-    <tag k="name" v="${LOCATION_NAME}"/>
-    <tag k="office" v="software"/>
-    <tag k="addr:city" v="${CITY}"/>
-    <tag k="addr:suburb" v="${SUBURB}"/>
-    <tag k="addr:country" v="${COUNTRY}"/>
-  </node>
-</osm>
-EOF
+    {
+        echo '<?xml version="1.0" encoding="UTF-8"?>'
+        echo '<osm version="0.6" generator="Custom Location Script">'
+        echo
+        echo "  <node id=\"${UNIQUE_ID}\" lat=\"${LAT}\" lon=\"${LON}\" version=\"1\">"
+        
+        # Required tags
+        add_tag "name" "${LOCATION_NAME}"
+        add_tag "office" "software"
+        add_tag "addr:city" "${CITY}"
+        add_tag "addr:suburb" "${SUBURB}"
+        add_tag "addr:country" "${COUNTRY}"
+        
+        # Optional tags - Basic Information
+        add_tag "name:en" "${ENGLISH_NAME}"
+        add_tag "website" "${WEBSITE_URL}"
+        
+        # Optional tags - Address Information
+        add_tag "addr:housenumber" "${HOUSE_NUMBER}"
+        add_tag "addr:street" "${STREET}"
+        add_tag "addr:postcode" "${POSTCODE}"
+        add_tag "addr:state" "${STATE}"
+        add_tag "addr:country_code" "${COUNTRY_CODE}"
+        
+        # Optional tags - Contact Information
+        add_tag "phone" "${PHONE}"
+        add_tag "email" "${EMAIL}"
+        
+        # Optional tags - Additional Metadata
+        add_tag "opening_hours" "${OPENING_HOURS}"
+        add_tag "wheelchair" "${WHEELCHAIR_ACCESS}"
+        [[ -n "${NUM_FLOORS}" ]] && add_tag "building" "yes"
+        add_tag "building:levels" "${NUM_FLOORS}"
+        add_tag "capacity" "${MAX_CAPACITY}"
+        
+        # Optional tags - Amenities
+        add_tag "amenity:parking" "${PARKING_AVAILABLE}"
+        add_tag "internet_access" "${INTERNET_ACCESS}"
+        
+        # Optional tags - Company Specific
+        add_tag "company" "${COMPANY_NAME}"
+        add_tag "employees" "${NUM_EMPLOYEES}"
+        [[ -n "${COMPANY_NAME}" ]] && add_tag "industry" "software_development"
+        
+        # Optional tags - Tracking Information
+        add_tag "created_by" "${CREATOR_NAME}"
+        add_tag "maintainer" "${MAINTAINER}"
+        add_tag "maintainer:email" "${MAINTAINER_EMAIL}"
+        
+        echo "  </node>"
+        echo "</osm>"
+    } > /tmp/custom_location.osm
 }
 
 # Import the custom location

@@ -1,97 +1,161 @@
 {
-	"info": {
-		"_postman_id": "50777d99-d33d-4921-8d1a-71dbfa0d445f",
-		"name": "Geo Location API",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "19746263"
-	},
-	"item": [
-		{
-			"name": "add-location",
-			"request": {
-				"auth": {
-					"type": "apikey",
-					"apikey": [
-						{
-							"key": "value",
-							"value": "XXXX",
-							"type": "string"
-						},
-						{
-							"key": "key",
-							"value": "X-API-Key",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [
-					{
-						"key": "x-api-key",
-						"value": "xxxx",
-						"type": "text"
-					},
-					{
-						"key": "Accept",
-						"value": "application/json",
-						"type": "text"
-					},
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"name\": \"Hello World\",\r\n    \"city\": \"Dhaka\",\r\n    \"suburb\": \"Mohammadpur\",\r\n    \"country\": \"Bangladesh\",\r\n    \"latitude\": 23.744431306905756,\r\n    \"longitude\": 90.35132875476877\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "{{base_url}}",
-					"host": [
-						"{{base_url}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "search-location",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://{{base_url}}/nominatim/search.php?q=Hello World&polygon_geojson=1&format=jsonv2",
-					"protocol": "http",
-					"host": [
-						"{{base_url}}"
-					],
-					"path": [
-						"nominatim",
-						"search.php"
-					],
-					"query": [
-						{
-							"key": "q",
-							"value": "Hello World"
-						},
-						{
-							"key": "polygon_geojson",
-							"value": "1"
-						},
-						{
-							"key": "format",
-							"value": "jsonv2"
-						}
-					]
-				}
-			},
-			"response": []
-		}
-	]
+    "info": {
+        "_postman_id": "50777d99-d33d-4921-8d1a-71dbfa0d445f",
+        "name": "Geo Location API",
+        "description": "API collection for managing location data in Nominatim",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_exporter_id": "19746263"
+    },
+    "item": [
+        {
+            "name": "add-location",
+            "request": {
+                "auth": {
+                    "type": "apikey",
+                    "apikey": [
+                        {
+                            "key": "value",
+                            "value": "XXXX",
+                            "type": "string"
+                        },
+                        {
+                            "key": "key",
+                            "value": "X-API-Key",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "x-api-key",
+                        "value": "xxxx",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Accept",
+                        "value": "application/json",
+                        "type": "text"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json",
+                        "type": "text"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    // Required fields\n    \"name\": \"Hello World\",\n    \"city\": \"Dhaka\",\n    \"suburb\": \"Mohammadpur\",\n    \"country\": \"Bangladesh\",\n    \"latitude\": 23.744431306905756,\n    \"longitude\": 90.35132875476877,\n\n    // Optional - Basic Information\n    \"english_name\": \"Hello World Ltd\",\n    \"website\": \"https://example.com\",\n    \n    // Optional - Address Details\n    \"house_number\": \"123\",\n    \"street\": \"Main Street\",\n    \"postcode\": \"1207\",\n    \"state\": \"Dhaka\",\n    \"country_code\": \"BD\",\n    \n    // Optional - Contact Information\n    \"phone\": \"+880123456789\",\n    \"email\": \"contact@example.com\",\n    \n    // Optional - Building Information\n    \"hours\": \"Mo-Fr 09:00-17:00\",\n    \"wheelchair\": \"yes\",\n    \"floors\": \"3\",\n    \"capacity\": \"500\",\n    \n    // Optional - Amenities\n    \"parking\": \"yes\",\n    \"internet\": \"wlan\",\n    \n    // Optional - Company Information\n    \"company\": \"Hello World Ltd\",\n    \"employees\": \"50\",\n    \n    // Optional - Metadata\n    \"creator\": \"John Doe\",\n    \"maintainer\": \"Facilities Team\",\n    \"maintainer_email\": \"facilities@example.com\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "description": "Add a new location to the Nominatim database. Only the required fields are mandatory, all other fields are optional.",
+                "url": {
+                    "raw": "{{base_url}}",
+                    "host": [
+                        "{{base_url}}"
+                    ]
+                }
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Hello World\",\n    \"city\": \"Dhaka\",\n    \"suburb\": \"Mohammadpur\",\n    \"country\": \"Bangladesh\",\n    \"latitude\": 23.744431306905756,\n    \"longitude\": 90.35132875476877\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}"
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [],
+                    "cookie": [],
+                    "body": "{\n    \"success\": true,\n    \"message\": \"Location added successfully\",\n    \"output\": []\n}"
+                },
+                {
+                    "name": "Error Response",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}"
+                        }
+                    },
+                    "status": "Bad Request",
+                    "code": 400,
+                    "_postman_previewlanguage": "json",
+                    "header": [],
+                    "cookie": [],
+                    "body": "{\n    \"error\": \"Missing required fields: name, city, suburb, country, latitude, longitude\"\n}"
+                }
+            ]
+        },
+        {
+            "name": "search-location",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "http://{{base_url}}/nominatim/search.php?q=Hello World&polygon_geojson=1&format=jsonv2",
+                    "protocol": "http",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "nominatim",
+                        "search.php"
+                    ],
+                    "query": [
+                        {
+                            "key": "q",
+                            "value": "Hello World"
+                        },
+                        {
+                            "key": "polygon_geojson",
+                            "value": "1"
+                        },
+                        {
+                            "key": "format",
+                            "value": "jsonv2"
+                        }
+                    ]
+                },
+                "description": "Search for locations in the Nominatim database"
+            },
+            "response": [
+                {
+                    "name": "Success Response",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://{{base_url}}/nominatim/search.php?q=Hello World&polygon_geojson=1&format=jsonv2"
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "_postman_previewlanguage": "json",
+                    "header": [],
+                    "cookie": [],
+                    "body": "[\n    {\n        \"place_id\": 123456,\n        \"licence\": \"Data © OpenStreetMap contributors, ODbL 1.0\",\n        \"osm_type\": \"node\",\n        \"osm_id\": 7654321,\n        \"boundingbox\": [\"23.7443\", \"23.7444\", \"90.3513\", \"90.3514\"],\n        \"lat\": \"23.744431306905756\",\n        \"lon\": \"90.35132875476877\",\n        \"display_name\": \"Hello World, Mohammadpur, Dhaka, Bangladesh\",\n        \"class\": \"office\",\n        \"type\": \"software\",\n        \"importance\": 0.001\n    }\n]"
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "your-server-url",
+            "type": "string"
+        }
+    ]
 }

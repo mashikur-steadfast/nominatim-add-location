@@ -118,19 +118,54 @@ function downloadScript() {
     return true;
 }
 
+// Build command with parameters
+function buildCommand($data) {
+    $command = [SCRIPT_PATH];
+    
+    // Required parameters - no need for extra escaping as they'll be passed directly
+    $command[] = "-n " . $data['name'];
+    $command[] = "-c " . $data['city'];
+    $command[] = "-s " . $data['suburb'];
+    $command[] = "-co " . $data['country'];
+    $command[] = "-lat " . $data['latitude'];
+    $command[] = "-lon " . $data['longitude'];
+    
+    // Optional parameters
+    $optionalParams = [
+        'english_name' => '--english-name',
+        'website' => '--website',
+        'house_number' => '--house-number',
+        'street' => '--street',
+        'postcode' => '--postcode',
+        'state' => '--state',
+        'country_code' => '--country-code',
+        'phone' => '--phone',
+        'email' => '--email',
+        'hours' => '--hours',
+        'wheelchair' => '--wheelchair',
+        'floors' => '--floors',
+        'capacity' => '--capacity',
+        'parking' => '--parking',
+        'internet' => '--internet',
+        'company' => '--company',
+        'employees' => '--employees',
+        'creator' => '--creator',
+        'maintainer' => '--maintainer',
+        'maintainer_email' => '--maintainer-email'
+    ];
+    
+    foreach ($optionalParams as $key => $param) {
+        if (isset($data[$key]) && !empty($data[$key])) {
+            $command[] = $param . " " . $data[$key];
+        }
+    }
+    
+    return 'sudo ' . implode(' ', $command) . ' 2>&1';
+}
+
 // Execute script with parameters
 function executeScript($data) {
-    $command = sprintf(
-        'sudo %s -n "%s" -c "%s" -s "%s" -co "%s" -lat %s -lon %s 2>&1',
-        SCRIPT_PATH,
-        escapeshellarg($data['name']),
-        escapeshellarg($data['city']),
-        escapeshellarg($data['suburb']),
-        escapeshellarg($data['country']),
-        escapeshellarg($data['latitude']),
-        escapeshellarg($data['longitude'])
-    );
-    
+    $command = buildCommand($data);
     exec($command, $output, $return_code);
     
     // Clean up
