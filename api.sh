@@ -120,17 +120,17 @@ function downloadScript() {
 
 // Build command with parameters
 function buildCommand($data) {
-    $command = [SCRIPT_PATH];
+    $params = [];
     
-    // Required parameters - no need for extra escaping as they'll be passed directly
-    $command[] = "-n " . $data['name'];
-    $command[] = "-c " . $data['city'];
-    $command[] = "-s " . $data['suburb'];
-    $command[] = "-co " . $data['country'];
-    $command[] = "-lat " . $data['latitude'];
-    $command[] = "-lon " . $data['longitude'];
+    // Required parameters with proper escaping
+    $params[] = "-n '" . str_replace("'", "'\\''", $data['name']) . "'";
+    $params[] = "-c '" . str_replace("'", "'\\''", $data['city']) . "'";
+    $params[] = "-s '" . str_replace("'", "'\\''", $data['suburb']) . "'";
+    $params[] = "-co '" . str_replace("'", "'\\''", $data['country']) . "'";
+    $params[] = "-lat " . $data['latitude'];
+    $params[] = "-lon " . $data['longitude'];
     
-    // Optional parameters
+    // Optional parameters mapping
     $optionalParams = [
         'english_name' => '--english-name',
         'website' => '--website',
@@ -154,13 +154,17 @@ function buildCommand($data) {
         'maintainer_email' => '--maintainer-email'
     ];
     
+    // Add optional parameters if they exist
     foreach ($optionalParams as $key => $param) {
-        if (isset($data[$key]) && !empty($data[$key])) {
-            $command[] = $param . " " . $data[$key];
+        if (isset($data[$key]) && $data[$key] !== '') {
+            // Escape single quotes in the value and wrap the entire value in single quotes
+            $value = str_replace("'", "'\\''", $data[$key]);
+            $params[] = $param . " '" . $value . "'";
         }
     }
     
-    return 'sudo ' . implode(' ', $command) . ' 2>&1';
+    // Construct the final command
+    return 'sudo ' . SCRIPT_PATH . ' ' . implode(' ', $params) . ' 2>&1';
 }
 
 // Execute script with parameters
